@@ -11,10 +11,6 @@ jobs:
     name: Build Android APK
     runs-on: ubuntu-22.04
 
-    env:
-      ANDROID_HOME: ${{ github.workspace }}/.buildozer/android/platform/android-sdk
-      ANDROID_SDK_ROOT: ${{ github.workspace }}/.buildozer/android/platform/android-sdk
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -54,23 +50,25 @@ jobs:
             libssl-dev \
             build-essential
 
-      - name: Install Buildozer and Python tools
+      - name: Install Buildozer tools
         run: |
           python3 -m pip install --upgrade pip
           python3 -m pip install --upgrade buildozer cython virtualenv
 
-      - name: Show project files
+      - name: Verify project files and API settings
         run: |
           pwd
           ls -la
           test -f main.py
           test -f buildozer.spec
+          echo "----- buildozer.spec Android settings -----"
+          grep -n "android.api\\|android.minapi\\|android.ndk_api\\|android.ndk\\|android.archs" buildozer.spec
 
-      - name: Force clean previous Android build
+      - name: Hard clean old Buildozer cache
         run: |
           rm -rf .buildozer
           rm -rf bin
-          buildozer android clean || true
+          rm -rf ~/.buildozer
 
       - name: Build debug APK
         run: |
