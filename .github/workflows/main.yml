@@ -45,6 +45,10 @@ jobs:
           python3 -m pip install --upgrade pip
           python3 -m pip install --upgrade buildozer cython virtualenv
 
+      - name: Clean old Android build
+        run: |
+          buildozer android clean || true
+
       - name: Build APK
         run: |
           buildozer -v android debug
